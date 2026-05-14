@@ -36,18 +36,21 @@
 // }
 
 
-
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '@/lib/AuthContext';
+import { useAuth } from '@/context/AuthContext'; // FIXED PATH
 
 export default function ProtectedRoute({ adminOnly = false }) {
-  const { user, loading } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return null;
 
-  if (!user) return <Navigate to="/login" replace />;
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
   
-  if (adminOnly && user.role !== 'admin') return <Navigate to="/" replace />;
+  if (adminOnly && user?.role !== 'admin') {
+    return <Navigate to="/" replace />;
+  }
 
   return <Outlet />;
 }

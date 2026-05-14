@@ -4,7 +4,6 @@ import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
-import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { PlayerProvider } from './context/PlayerContext';
 import AppShell from './components/layout/AppShell';
 import Explorer from './pages/Explorer';
@@ -12,36 +11,34 @@ import UserProfile from './pages/UserProfile';
 import PublicProfile from './pages/PublicProfile';
 import UserSearch from './pages/UserSearch';
 import AdminPanel from './pages/AdminPanel';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import ProtectedRoute from './Components/ProtectedRoute'; // FIX: Add this import
 
 const AuthenticatedApp = () => {
-  const { loading, user } = useAuth();
+  const { loading } = useAuth();
 
-  if (loading) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-neon-cyan/20 border-t-neon-cyan rounded-full animate-spin" />
-          <span className="font-mono text-[10px] text-neon-cyan/40 tracking-widest">BOOTING LOCAL...</span>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <div className="bg-black text-cyan-500 font-mono p-10">BOOTING_LOCAL_OS...</div>;
 
   return (
     <PlayerProvider>
       <Routes>
         <Route element={<AppShell />}>
           <Route path="/" element={<Explorer />} />
+          <Route path="/user/:email" element={<PublicProfile />} />
+          <Route path="/people" element={<UserSearch />} />
+          
           {/* Protected Routes */}
           <Route element={<ProtectedRoute />}>
             <Route path="/profile" element={<UserProfile />} />
-            <Route path="/admin" element={<ProtectedRoute adminOnly={true}><AdminPanel /></ProtectedRoute>} />
           </Route>
-          {/* Public Views */}
-          <Route path="/user/:email" element={<PublicProfile />} />
-          <Route path="/people" element={<UserSearch />} />
+          
+          {/* Admin Route */}
+          <Route element={<ProtectedRoute adminOnly={true} />}>
+            <Route path="/admin" element={<AdminPanel />} />
+          </Route>
         </Route>
-        {/* Auth Pages */}
+
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="*" element={<PageNotFound />} />
@@ -49,7 +46,8 @@ const AuthenticatedApp = () => {
     </PlayerProvider>
   );
 };
-function App() {
+
+export default function App() {
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
@@ -61,5 +59,4 @@ function App() {
     </AuthProvider>
   );
 }
-
-export default App;
+export default app;
