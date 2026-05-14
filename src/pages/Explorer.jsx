@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import CategoryTabs from '../components/explorer/CategoryTabs';
 import TrackRow from '../components/explorer/TrackRow';
@@ -13,7 +12,7 @@ export default function Explorer() {
 
   const { data: tracks = [], isLoading } = useQuery({
     queryKey: ['tracks'],
-    queryFn: () => base44.entities.Track.list('-created_date', 100),
+    queryFn: () => api.tracks.list(),
   });
 
   const handleCommentClick = (track) => {
