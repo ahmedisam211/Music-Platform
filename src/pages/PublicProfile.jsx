@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/api';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { User, Zap, Mail, UserPlus, UserCheck, Music } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -18,20 +18,20 @@ export default function PublicProfile() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    base44.auth.me().then(setMe);
+    api.auth.me().then(setMe);
   }, []);
 
   // Get all users to find this one
   const { data: allUsers = [] } = useQuery({
     queryKey: ['users'],
-    queryFn: () => base44.entities.User.list(),
+    queryFn: () => api.entities.User.list(),
   });
   const profileUser = allUsers.find(u => u.email === email);
 
   // Tracks uploaded by this user
   const { data: tracks = [] } = useQuery({
     queryKey: ['tracks', 'by', email],
-    queryFn: () => base44.entities.Track.filter({ uploaded_by_email: email }, '-created_date', 50),
+    queryFn: () => api.entities.Track.filter({ uploaded_by_email: email }, '-created_date', 50),
     enabled: !!email,
   });
 
@@ -39,9 +39,9 @@ export default function PublicProfile() {
   const { data: hypedTracks = [] } = useQuery({
     queryKey: ['hyped', email],
     queryFn: async () => {
-      const hyped = await base44.entities.HypedTrack.filter({ user_email: email });
+      const hyped = await api.entities.HypedTrack.filter({ user_email: email });
       if (!hyped.length) return [];
-      const all = await base44.entities.Track.list();
+      const all = await api.entities.Track.list();
       const ids = new Set(hyped.map(h => h.track_id));
       return all.filter(t => ids.has(t.id));
     },
@@ -51,12 +51,12 @@ export default function PublicProfile() {
   // Followers / following counts
   const { data: followers = [] } = useQuery({
     queryKey: ['followers', email],
-    queryFn: () => base44.entities.Follow.filter({ following_email: email }),
+    queryFn: () => api.entities.Follow.filter({ following_email: email }),
     enabled: !!email,
   });
   const { data: following = [] } = useQuery({
     queryKey: ['following', email],
-    queryFn: () => base44.entities.Follow.filter({ follower_email: email }),
+    queryFn: () => api.entities.Follow.filter({ follower_email: email }),
     enabled: !!email,
   });
 
@@ -68,9 +68,9 @@ export default function PublicProfile() {
     mutationFn: async () => {
       if (isFollowing) {
         const record = followers.find(f => f.follower_email === me.email);
-        if (record) await base44.entities.Follow.delete(record.id);
+        if (record) await api.entities.Follow.delete(record.id);
       } else {
-        await base44.entities.Follow.create({
+        await api.entities.Follow.create({
           follower_email: me.email,
           following_email: email,
           follower_name: me.full_name || '',

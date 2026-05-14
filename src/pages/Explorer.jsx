@@ -5,6 +5,7 @@ import TrackRow from '../components/explorer/TrackRow';
 import TrackComments from '../Components/social/TrackComments';
 import { AnimatePresence } from 'framer-motion';
 import { Zap } from 'lucide-react';
+import { api } from '@/api/api';
 
 export default function Explorer() {
   const [category, setCategory] = useState('all');

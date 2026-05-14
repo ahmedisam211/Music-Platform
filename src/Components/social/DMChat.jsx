@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/api';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { X, Send, Lock } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -15,20 +15,20 @@ export default function DMChat({ recipientEmail, recipientName, onClose }) {
   const conversationId = [myEmail, recipientEmail].sort().join('::');
 
   useEffect(() => {
-    base44.auth.me().then(u => setMyEmail(u?.email || ''));
+    api.auth.me().then(u => setMyEmail(u?.email || ''));
   }, []);
 
   const { data: messages = [] } = useQuery({
     queryKey: ['dm', conversationId],
     queryFn: () => conversationId && myEmail
-      ? base44.entities.Message.filter({ conversation_id: conversationId }, 'created_date', 100)
+      ? api.entities.Message.filter({ conversation_id: conversationId }, 'created_date', 100)
       : [],
     enabled: !!myEmail,
     refetchInterval: 3000,
   });
 
   const sendMessage = useMutation({
-    mutationFn: (content) => base44.entities.Message.create({
+    mutationFn: (content) => api.entities.Message.create({
       sender_email: myEmail,
       receiver_email: recipientEmail,
       content,

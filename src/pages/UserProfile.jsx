@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/api';
 import { useNavigate } from 'react-router-dom';
 
 // My profile just redirects to public profile view with my own email
@@ -7,7 +7,7 @@ export default function UserProfile() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    base44.auth.me().then(user => {
+    api.auth.me().then(user => {
       if (user?.email) {
         navigate(`/user/${encodeURIComponent(user.email)}`, { replace: true });
       }

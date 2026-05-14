@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/api';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Send, MessageSquare, X, User } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -12,13 +12,13 @@ export default function TrackComments({ track, onClose }) {
 
   const { data: comments = [], isLoading } = useQuery({
     queryKey: ['comments', track.id],
-    queryFn: () => base44.entities.Comment.filter({ track_id: track.id }, '-created_date', 100),
+    queryFn: () => api.entities.Comment.filter({ track_id: track.id }, '-created_date', 100),
   });
 
   const addComment = useMutation({
     mutationFn: async (content) => {
       const user = await base44.auth.me();
-      return base44.entities.Comment.create({
+      return api.entities.Comment.create({
         track_id: track.id,
         content,
         reaction_type: 'text',

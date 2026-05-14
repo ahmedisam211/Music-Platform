@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/api';
 import { useQuery } from '@tanstack/react-query';
 import { Search, User, UserPlus, UserCheck, Music } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -13,22 +13,22 @@ export default function UserSearch() {
   const [me, setMe] = useState(null);
 
   useEffect(() => {
-    base44.auth.me().then(setMe);
+    api.auth.me().then(setMe);
   }, []);
 
   const { data: allUsers = [] } = useQuery({
     queryKey: ['users'],
-    queryFn: () => base44.entities.User.list(),
+    queryFn: () => api.entities.User.list(),
   });
 
   const { data: allFollows = [] } = useQuery({
     queryKey: ['follows-all'],
-    queryFn: () => base44.entities.Follow.list(),
+    queryFn: () => api.entities.Follow.list(),
   });
 
   const { data: allTracks = [] } = useQuery({
     queryKey: ['tracks'],
-    queryFn: () => base44.entities.Track.list(),
+    queryFn: () => api.entities.Track.list(),
   });
 
   const filtered = allUsers.filter(u => {

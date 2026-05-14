@@ -101,6 +101,7 @@ export default function TrackRow({ track, index, allTracks, onCommentClick }) {
       </span>
 
       {/* Comment button */}
+      const { user } = useAuth();
       {onCommentClick && (
         <button
           onClick={(e) => { e.stopPropagation(); onCommentClick(track); }}

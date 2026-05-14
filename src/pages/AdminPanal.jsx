@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/api';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Shield, Pencil, Trash2, Check, X, Plus, Upload, Search, ChevronDown, ChevronUp, Zap, Users, Music, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -90,44 +90,44 @@ export default function AdminPanel() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    base44.auth.me().then(u => { setMe(u); setAuthLoading(false); });
+    api.auth.me().then(u => { setMe(u); setAuthLoading(false); });
   }, []);
 
   const { data: tracks = [], isLoading: tracksLoading } = useQuery({
     queryKey: ['tracks-admin'],
-    queryFn: () => base44.entities.Track.list('-created_date', 200),
+    queryFn: () => api.entities.Track.list('-created_date', 200),
     enabled: me?.role === 'admin',
   });
 
   const { data: requests = [] } = useQuery({
     queryKey: ['track-requests'],
-    queryFn: () => base44.entities.TrackRequest.list('-created_date', 100),
+    queryFn: () => api.entities.TrackRequest.list('-created_date', 100),
     enabled: me?.role === 'admin',
   });
 
   const { data: users = [] } = useQuery({
     queryKey: ['users-admin'],
-    queryFn: () => base44.entities.User.list(),
+    queryFn: () => api.entities.User.list(),
     enabled: me?.role === 'admin',
   });
 
   const updateTrack = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Track.update(id, data),
+    mutationFn: ({ id, data }) => api.entities.Track.update(id, data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tracks-admin'] }); queryClient.invalidateQueries({ queryKey: ['tracks'] }); setEditingId(null); },
   });
 
   const createTrack = useMutation({
-    mutationFn: (data) => base44.entities.Track.create(data),
+    mutationFn: (data) => api.entities.Track.create(data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tracks-admin'] }); queryClient.invalidateQueries({ queryKey: ['tracks'] }); setShowNewForm(false); },
   });
 
   const deleteTrack = useMutation({
-    mutationFn: (id) => base44.entities.Track.delete(id),
+    mutationFn: (id) => api.entities.Track.delete(id),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tracks-admin'] }); queryClient.invalidateQueries({ queryKey: ['tracks'] }); },
   });
 
   const updateRequest = useMutation({
-    mutationFn: ({ id, status }) => base44.entities.TrackRequest.update(id, { status }),
+    mutationFn: ({ id, status }) => api.entities.TrackRequest.update(id, { status }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['track-requests'] }),
   });
 
